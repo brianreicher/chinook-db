@@ -17,7 +17,7 @@ ORDER BY ArtistName;
  Give a list of the countries in alphabetical order.
  */
 
-SELECT DISTINCT Country
+SELECT DISTINCT Country as CountryName
 FROM customers JOIN invoices i on customers.CustomerId = i.CustomerId JOIN
     invoice_items ii on i.InvoiceId = ii.InvoiceId JOIN tracks t on t.TrackId = ii.TrackId JOIN genres g on g.GenreId = t.GenreId
 WHERE g.Name = 'Drama'
@@ -29,10 +29,10 @@ ORDER BY Country;
     Sort the list by number of tracks in descending order.
  */
 
-SELECT COUNT(t.Name) as Number, g.Name
+SELECT g.Name as GenreName, COUNT(t.Name) as NumberOfTracks
 FROM tracks t join albums a on a.AlbumId = t.AlbumId join genres g on g.GenreId = t.GenreId
 GROUP BY g.Name
-ORDER BY Number DESC;
+ORDER BY NumberOfTracks DESC;
 
 
 /*
@@ -42,10 +42,10 @@ ORDER BY Number DESC;
  The list should be alphabetized in ascending order by the track name.
  */
 
-SELECT tr.Name as TrackName, al.Title as AlbumTitle, Composer
+SELECT tr.Name as TrackName, al.Title as AlbumTitle, Composer as ComposerList
 FROM tracks tr JOIN albums al on al.AlbumId = tr.AlbumId
 WHERE Composer like '%Steven Tyler%' and Composer not like '%Joe Perry%'
-ORDER BY TrackName; --default is ASC
+ORDER BY TrackName;
 
 
 /*
@@ -53,10 +53,10 @@ ORDER BY TrackName; --default is ASC
  Provide a list of album titles with the artist's name in alphabetic order by Album name.
  */
 
-SELECT SUM(Milliseconds) as AlbumTotalLength, Title as AlbumTitle, a2.Name as ArtistName
+SELECT Title as AlbumTitle, a2.Name as ArtistName
 FROM albums join tracks t on albums.AlbumId = t.AlbumId join artists a2 on albums.ArtistId = a2.ArtistId
 GROUP BY Title
-HAVING AlbumTotalLength >
+HAVING SUM(t.Milliseconds) >
 (SELECT AVG(AlbumTotal) as AvgAlbumTotalLength
     FROM (SELECT SUM(Milliseconds) as AlbumTotal
     FROM tracks t JOIN albums a on a.AlbumId = t.AlbumId
@@ -77,9 +77,9 @@ ORDER BY AlbumTitle;
  nor identifying information about the track/invoice/etc other than the criteria described above.
  */
 
-SELECT DISTINCT t.Composer as ForgottenComposer
+SELECT DISTINCT t.Composer as forgotComposer
 FROM employees JOIN customers c on employees.EmployeeId = c.SupportRepId JOIN
     invoices i on c.CustomerId = i.CustomerId JOIN invoice_items ii on i.InvoiceId = ii.InvoiceId
     JOIN tracks t on t.TrackId = ii.TrackId JOIN genres g on g.GenreId = t.GenreId
 WHERE employees.FirstName = 'Margaret' and employees.LastName = 'Park'
-  and i.Total>10 and i.BillingCountry = 'France' and g.Name in ('Jazz', 'Classical') and ForgottenComposer IS NOT NULL;
+  and i.Total>10 and i.BillingCountry = 'France' and g.Name in ('Jazz', 'Classical') and forgotComposer IS NOT NULL;
